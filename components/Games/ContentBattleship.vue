@@ -180,15 +180,13 @@ export default {
 
     handleDrop(row, col) {
       if (this.currentShip && this.currentShip.count > 0) {
-        const placed = this.battleshipStore.placeShip(
+        this.battleshipStore.placeShip(
+          this.battleshipStore.playerBoard,
+          this.battleshipStore.availablePlayerShips,
           row,
           col,
-          this.currentShip.size,
-          this.currentShipOrientation
+          this.currentShip
         );
-        if (placed) {
-          this.battleshipStore.decrementShipCount(this.currentShip.id);
-        }
       }
     },
 
@@ -211,6 +209,9 @@ export default {
       this.battleshipStore.initGame();
       this.isGameStarted = false;
     },
+  },
+  mounted() {
+    this.battleshipStore.initGame();
   },
   setup() {
     const battleshipStore = useBattleshipStore();
