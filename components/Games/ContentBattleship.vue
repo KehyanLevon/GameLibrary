@@ -30,7 +30,6 @@
               class="ship-in-cell"
               draggable="true"
               @dragstart="handleShipDragStart(cell, rowIndex, colIndex)"
-              @dragend="handleShipDragEnd"
             ></div>
           </div>
         </div>
@@ -169,13 +168,6 @@ export default {
     handleShipDragStart(ship, row, col) {
       this.originalPosition = { row, col };
       this.currentShip = ship;
-    },
-
-    handleShipDragEnd() {
-      if (this.originalPosition) {
-        console.log("Возврат на исходную позицию", this.originalPosition);
-      }
-      this.originalPosition = null;
     },
 
     handleDrop(row, col) {
