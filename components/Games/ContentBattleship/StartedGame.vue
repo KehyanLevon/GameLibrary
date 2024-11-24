@@ -6,7 +6,7 @@
       <Board
         title="Computer's Board"
         :board="computerBoard"
-        :showShips="true"
+        :showShips="false"
         @handle-сell-сlick="handleAttack"
       />
     </div>
