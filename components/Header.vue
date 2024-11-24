@@ -4,8 +4,9 @@
       <div class="col-12">
         <nav class="main-nav">
           <NuxtLink to="/" class="logo">
-            <img src="@/assets/images/logo.png" alt="" />
+            <img src="@/assets/images/logo.png" alt="Logo" />
           </NuxtLink>
+
           <div class="search-input">
             <form id="search" action="#">
               <input
@@ -13,15 +14,21 @@
                 placeholder="Type Something"
                 id="searchText"
                 name="searchKeyword"
-                onkeypress="handle"
               />
               <i class="fa fa-search"></i>
             </form>
           </div>
+
           <ul class="nav">
-            <li><NuxtLink to="/" class="logo active">Home</NuxtLink></li>
-            <li><NuxtLink to="/AboutUs">About</NuxtLink></li>
-            <li><NuxtLink to="/Profile">Profile</NuxtLink></li>
+            <li>
+              <NuxtLink to="/">Home</NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/AboutUs">About</NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/Profile">Profile</NuxtLink>
+            </li>
           </ul>
         </nav>
       </div>
