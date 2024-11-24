@@ -132,6 +132,11 @@ p {
 	border-radius: 23px;
 }
 
+.templatemo-item:hover {
+  transition: transform .2s;
+  transform: scale(1.1);
+}
+
 .main-button a {
   font-size: 14px;
   color: #fff;
@@ -388,6 +393,7 @@ Header Style
 
 .header-area .main-nav .logo img {
   width: 191px;
+  margin: 0 20px;
 }
 
 .background-header .main-nav .logo {

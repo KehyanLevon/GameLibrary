@@ -6,7 +6,7 @@
           <p>
             Copyright © xxxx <a href="#">Cyborg Gaming</a> Company. Lorem
             <br />Design: Lorem ipsum dolor
-            <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
+            <a href="#" target="_blank">LoremI</a>
           </p>
         </div>
       </div>
