@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import ContentBattleship from "~/components/Games/ContentBattleship.vue";
+import ContentBattleship from "~/components/Games/ContentBattleship/index.vue";
 export default {
   components: {
     ContentBattleship,

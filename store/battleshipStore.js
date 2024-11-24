@@ -1,87 +1,61 @@
 import { defineStore } from "pinia";
 
+const availableShips = [
+  {
+    id: 1,
+    size: 4,
+    color: "#ff4c4c",
+    count: 1,
+    orientation: "horizontal",
+  },
+  {
+    id: 2,
+    size: 3,
+    color: "#6fa3ef",
+    count: 2,
+    orientation: "horizontal",
+  },
+  {
+    id: 3,
+    size: 2,
+    color: "#d4a5a5",
+    count: 3,
+    orientation: "horizontal",
+  },
+  {
+    id: 4,
+    size: 1,
+    color: "#9fc06f",
+    count: 4,
+    orientation: "horizontal",
+  },
+];
+
+const emptyBoard = Array(10)
+  .fill()
+  .map(() => Array(10).fill(null));
+
 export const useBattleshipStore = defineStore({
   id: "battleship",
   state: () => ({
-    playerBoard: null,
-    computerBoard: null,
-    isComputerSetupComplete: false,
     currentShipSize: 4,
-    placedShips: [],
-    gameOver: false,
     currentTurn: "player",
     availablePlayerShips: [],
     availableComputerShips: [],
+    placedShips: [],
+    playerBoard: null,
+    computerBoard: null,
     winner: null,
+    isComputerSetupComplete: false,
+    gameOver: false,
+    isGameStarted: false,
   }),
   actions: {
     initGame() {
-      this.playerBoard = Array(10)
-        .fill()
-        .map(() => Array(10).fill(null));
-      this.computerBoard = Array(10)
-        .fill()
-        .map(() => Array(10).fill(null));
-      this.availablePlayerShips = [
-        {
-          id: 1,
-          size: 4,
-          color: "#ff4c4c",
-          count: 1,
-          orientation: "horizontal",
-        },
-        {
-          id: 2,
-          size: 3,
-          color: "#6fa3ef",
-          count: 2,
-          orientation: "horizontal",
-        },
-        {
-          id: 3,
-          size: 2,
-          color: "#d4a5a5",
-          count: 3,
-          orientation: "horizontal",
-        },
-        {
-          id: 4,
-          size: 1,
-          color: "#9fc06f",
-          count: 4,
-          orientation: "horizontal",
-        },
-      ];
-      this.availableComputerShips = [
-        {
-          id: 1,
-          size: 4,
-          color: "#ff4c4c",
-          count: 1,
-          orientation: "horizontal",
-        },
-        {
-          id: 2,
-          size: 3,
-          color: "#6fa3ef",
-          count: 2,
-          orientation: "horizontal",
-        },
-        {
-          id: 3,
-          size: 2,
-          color: "#d4a5a5",
-          count: 3,
-          orientation: "horizontal",
-        },
-        {
-          id: 4,
-          size: 1,
-          color: "#9fc06f",
-          count: 4,
-          orientation: "horizontal",
-        },
-      ];
+      this.playerBoard = JSON.parse(JSON.stringify(emptyBoard));
+      this.computerBoard = JSON.parse(JSON.stringify(emptyBoard));
+      this.availablePlayerShips = JSON.parse(JSON.stringify(availableShips));
+      this.availableComputerShips = JSON.parse(JSON.stringify(availableShips));
       this.isComputerSetupComplete = false;
       this.gameOver = false;
       this.currentTurn = "player";
@@ -112,19 +86,38 @@ export const useBattleshipStore = defineStore({
           this.nextShipSize();
         }
         this.decrementShipCount(availableShips, ship);
+        this.playerBoard = [...this.playerBoard];
       }
     },
 
     canPlaceShip(board, row, col, size, orientation) {
-      if (orientation === "horizontal") {
-        if (col + size > 10) return false;
-        for (let i = 0; i < size; i++) {
-          if (board[row][col + i] !== null) return false;
+      if (
+        (orientation === "horizontal" && col + size > 10) ||
+        (orientation === "vertical" && row + size > 10)
+      ) {
+        return false;
+      }
+      for (let i = 0; i < size; i++) {
+        let freeUp = row - 1 < 0 || board[row - 1][col] === null;
+        let freeDown = row + 1 >= 10 || board[row + 1][col] === null;
+        let freeLeft = col - 1 < 0 || board[row][col - 1] === null;
+        let freeRight = col + 1 >= 10 || board[row][col + 1] === null;
+        if (size === 1) {
+          return freeUp && freeDown && freeLeft && freeRight;
         }
-      } else {
-        if (row + size > 10) return false;
-        for (let i = 0; i < size; i++) {
-          if (board[row + i][col] !== null) return false;
+        if (orientation === "horizontal" &&
+            !((board[row][col++] === null) && //is not captured
+            ((i === 0 && freeUp && freeDown && freeLeft) || //first el check
+            (i === size - 1 && freeUp && freeDown && freeRight) || //last el check
+            (i > 0 && i < size - 1 && freeUp && freeDown)))) { // middle el check 
+            return false;
+        } else if (orientation === "vertical" && (
+            !((board[row++][col] === null) && //is not captured
+            ((i === 0 && freeUp  && freeLeft && freeRight ) || //first el check
+            (i === size - 1  && freeDown  && freeLeft && freeRight) ||// last el check
+            (i > 0 && i < size - 1 && freeLeft && freeRight))) //middle elements check
+          )) {
+            return false;
         }
       }
       return true;
@@ -165,7 +158,7 @@ export const useBattleshipStore = defineStore({
                 col,
                 ship
               );
-              placed = true; // Завершаем размещение корабля
+              placed = true;
             }
           }
         }
@@ -175,9 +168,9 @@ export const useBattleshipStore = defineStore({
 
     decrementShipCount(availableShips, ship) {
       if (ship && --ship.count === 0) {
-          let tmp = availableShips.filter((s) => s.id !== ship.id);
-          availableShips.length = 0;
-          availableShips.push(...tmp);
+        let tmp = availableShips.filter((s) => s.id !== ship.id);
+        availableShips.length = 0;
+        availableShips.push(...tmp);
       }
     },
 
@@ -192,6 +185,7 @@ export const useBattleshipStore = defineStore({
             status: "hit",
           };
           hit = true;
+          this.markAdjacentFields(this.computerBoard, row, col)
         } else {
           this.computerBoard[row][col] = { status: "miss" };
           hit = true;
@@ -213,6 +207,7 @@ export const useBattleshipStore = defineStore({
             ...this.playerBoard[row][col],
             status: "hit",
           };
+          this.markAdjacentFields(this.playerBoard, row, col);
         } else {
           this.playerBoard[row][col] = { status: "miss" };
         }
@@ -253,8 +248,20 @@ export const useBattleshipStore = defineStore({
         this.currentTurn = null;
       }
     },
+    markAdjacentFields(board, row, col) {
+      if(col - 1 >= 0 && board[row][col - 1] === null) {
+        board[row][col - 1] = { status: "miss" };
+      }
+      if(col + 1 < 10 && board[row][col + 1] === null) {
+        board[row][col + 1] = { status: "miss" };
+      }
+      if(row - 1 >= 0 && board[row - 1][col] === null) {
+        board[row - 1][col] = { status: "miss" };
+      }
+      if(row + 1 < 10 && board[row + 1][col] === null) {
+        board[row + 1][col] = { status: "miss" };
+      }
+    },
   },
 });
 
-// TODO: надо переделать расставление караблей компютера (по возможности: не разрешать ставить корабли в радиусе одного блока от стоячега коробля)
-//       разбить на компоненты ContentBattleship.vue

@@ -45,27 +45,13 @@ export const useGameStore = defineStore("game2048", {
     },
 
     checkGameOver() {
-      let gameOver = true;
-
-      for (let i = 0; i < 4 && !gameOver; i++) {
-        for (let j = 0; j < 4; j++) {
-          if (this.board[i][j] === 0) {
-            gameOver = false;
-            break;
-          }
-        }
+      let tmpBoard = JSON.parse(JSON.stringify(this.board));
+      let hasZero = tmpBoard.some(row => row.some(cell => cell === 0));
+      if(!hasZero && !this.moveDown(tmpBoard) && !this.moveLeft(tmpBoard)) {
+        this.gameOver = true;
+        return;
       }
-
-      if (gameOver) {
-        for (let i = 0; i < 4; i++) {
-          for (let j = 0; j < 4; j++) {
-            const tile = this.board[i][j];
-            if (i < 3 && tile === this.board[i + 1][j]) gameOver = false;
-            if (j < 3 && tile === this.board[i][j + 1]) gameOver = false;
-          }
-        }
-      }
-      this.gameOver = gameOver;
+      this.gameOver = false;
     },
 
     move(direction) {
@@ -93,28 +79,28 @@ export const useGameStore = defineStore("game2048", {
       }
     },
 
-    moveUp() {
+    moveUp(board = this.board) {
       let moved = false;
       for (let col = 0; col < 4; col++) {
         const column = [];
         for (let row = 0; row < 4; row++) {
-          column.push(this.board[row][col]);
+          column.push(board[row][col]);
         }
         const result = this.slideAndMerge(column);
         if (result) moved = true;
         for (let row = 0; row < 4; row++) {
-          this.board[row][col] = column[row];
+          board[row][col] = column[row];
         }
       }
       return moved;
     },
 
-    moveDown() {
+    moveDown(board = this.board) {
       let moved = false;
       for (let col = 0; col < 4; col++) {
         const column = [];
         for (let row = 0; row < 4; row++) {
-          column.push(this.board[row][col]);
+          column.push(board[row][col]);
         }
 
         column.reverse();
@@ -123,34 +109,34 @@ export const useGameStore = defineStore("game2048", {
 
         column.reverse();
         for (let row = 0; row < 4; row++) {
-          this.board[row][col] = column[row];
+          board[row][col] = column[row];
         }
       }
       return moved;
     },
 
-    moveLeft() {
+    moveLeft(board = this.board) {
       let moved = false;
       for (let row = 0; row < 4; row++) {
-        const rowData = this.board[row];
+        const rowData = board[row];
         const result = this.slideAndMerge(rowData);
         if (result) moved = true;
 
-        this.board[row] = rowData;
+        board[row] = rowData;
       }
       return moved;
     },
 
-    moveRight() {
+    moveRight(board = this.board) {
       let moved = false;
       for (let row = 0; row < 4; row++) {
-        const rowData = this.board[row];
+        const rowData = board[row];
         rowData.reverse();
         const result = this.slideAndMerge(rowData);
         if (result) moved = true;
 
         rowData.reverse();
-        this.board[row] = rowData;
+        board[row] = rowData;
       }
       return moved;
     },
